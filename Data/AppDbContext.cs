@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DashboardTracker.Models;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace DashboardTracker.Data
@@ -9,5 +10,9 @@ namespace DashboardTracker.Data
     : base(options)
         {
         }
+
+        public DbSet<Job> Jobs { get; set; }
     }
+
+    
 }

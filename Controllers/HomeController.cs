@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using DashboardTracker.Models;
+using DashboardTracker.Repository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DashboardTracker.Controllers
@@ -7,21 +8,22 @@ namespace DashboardTracker.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly JobRepo _jobRepo;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, JobRepo jobRepo)
         {
             _logger = logger;
+            _jobRepo = jobRepo;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var jobs = await _jobRepo.GetAllJobsAsync();
+            var viewModel = new JobViewModel { Jobs = jobs };
+            return View(viewModel);
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
