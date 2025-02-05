@@ -1,0 +1,66 @@
+ 
+ # Visual Studio cache, build, and settings
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider project files
+.idea/
+
+# Build and publish outputs
+bin/
+obj/
+out/
+publish/
+
+# ASP.NET specific
+appsettings*.json
+secrets.json
+.env
+.env.*
+
+# Logs, databases, and generated files
+*.log
+*.tlog
+*.cache
+*.db
+*.mdf
+*.ldf
+
+# Entity Framework migrations
+Migrations/
+
+# Node dependencies (if using Node.js with .NET)
+node_modules/
+*.npm-debug.log
+*.yarn-debug.log
+*.yarn-error.log
+
+# Docker files
+docker-compose.override.yml
+**/Dockerfile
+
+# NuGet packages
+*.nupkg
+packages/
+project.lock.json
+project.assets.json
+
+# Resharper files
+_ReSharper*/
+**/*.DotSettings.user
+
+# Other IDE files
+*.sln.ide
+*.ipch
+*.pyc
+*.pdb
+*.swp
+*.class
+
+# System files
+Thumbs.db
+ehthumbs.db
+*.DS_Store
