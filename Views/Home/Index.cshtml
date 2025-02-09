@@ -4,30 +4,59 @@
 
 @model DashboardTracker.Models.JobViewModel
 
-<h1>Jobs</h1>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Name</th>
-            <th>Job URL</th>
-            <th>Interval</th>
-            <th>Status</th>
-            <!-- Add other columns as needed -->
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var job in Model.Jobs)
+<div class="row mb-8">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="searchString">Search by Name</label>
+            <input type="text" class="form-control" id="searchString" name="searchString" value="@ViewData["searchString"]" />
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="statusFilter">Filter by Status</label>
+            <select class="form-control" id="statusFilter" name="statusFilter">
+                <option value="">All</option>
+                <option value="active">Active</option>
+                <option value="stop">Stop</option>
+                <option value="null">Null</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</div>
+
+<div class="row mt-4">
+    @foreach (var job in Model.Jobs)
+    {
+        <div class="col-md-4">
+            <div class="card mb-4 @GetCardClass(job.status)">
+                <div class="card-body">
+                    <h5 class="card-title">@job.name</h5>
+                    <p class="card-text text-white">
+                        <strong>Job URL:</strong> @job.jobUrl <br />
+                        <strong>Interval:</strong> @job.interval @job.intervalUnit <br />
+                        <strong>Status:</strong> @job.status <br />
+                        <strong>Last Run:</strong> @job.lastRun?.ToString("g") <br />
+                        <strong>Next Run:</strong> @job.nextRun?.ToString("g") <br />
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@functions {
+    private string GetCardClass(string status)
+    {
+        return status switch
         {
-            <tr>
-                <td>@job.id</td>
-                <td>@job.name</td>
-                <td>@job.jobUrl</td>
-                <td>@job.interval</td>
-                <td>@job.status</td>
-                <!-- Add other columns as needed -->
-            </tr>
-        }
-    </tbody>
-</table>
+            "active" => "bg-success",
+            "stop" => "bg-warning text-dark",
+            null => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

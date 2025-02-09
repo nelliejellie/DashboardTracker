@@ -12,10 +12,12 @@ namespace DashboardTracker
             try
             {
                 Log.Logger = new LoggerConfiguration()
-               .ReadFrom.Configuration(new ConfigurationBuilder()
-                   .AddJsonFile("appsettings.json")
-                   .Build())
-               .CreateLogger();
+                .MinimumLevel.Debug()
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.File("logs/app-.log", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+
                 var builder = WebApplication.CreateBuilder(args);
 
                 // Add services to the container.
@@ -31,8 +33,9 @@ namespace DashboardTracker
                 builder.Services.AddScoped<JobRepo>();
                 var app = builder.Build();
 
+
                 // Configure the HTTP request pipeline.
-                if (!app.Environment.IsDevelopment())
+                if (app.Environment.IsDevelopment())
                 {
                     app.UseExceptionHandler("/Home/Error");
                     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.

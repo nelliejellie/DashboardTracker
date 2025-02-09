@@ -16,13 +16,43 @@ namespace DashboardTracker.Controllers
             _jobRepo = jobRepo;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString, string statusFilter)
         {
-            var jobs = await _jobRepo.GetAllJobsAsync();
-            var viewModel = new JobViewModel { Jobs = jobs };
-            return View(viewModel);
+            try
+            {
+                var jobs = await _jobRepo.GetAllJobsAsync();
+
+                if (!string.IsNullOrEmpty(searchString))
+                {
+                    jobs = jobs.Where(j => j.name != null && j.name.Contains(searchString, StringComparison.OrdinalIgnoreCase));
+                }
+
+                if (!string.IsNullOrEmpty(statusFilter))
+                {
+                    jobs = jobs.Where(j => j.status != null && j.status.Equals(statusFilter, StringComparison.OrdinalIgnoreCase));
+                }
+
+                var viewModel = new JobViewModel { Jobs = jobs };
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while getting all jobs.");
+                return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            }
         }
 
+        public IActionResult Apps()
+        {
+            ViewData["ActivePage"] = "Apps";
+            return View("ComingSoon");
+        }
+
+        public IActionResult Apis()
+        {
+            ViewData["ActivePage"] = "APIs";
+            return View("ComingSoon");
+        }
 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
