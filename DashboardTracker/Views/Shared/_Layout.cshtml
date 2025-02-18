@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - DashboardTracker</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/all.min.css">
+    <link rel="stylesheet" href="~/DashboardTracker.styles.css" asp-append-version="true" />
+    
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar" style="background-color: #003781;">
+                @* <div style="margin-top:5%;" class="mm-logo-buttons-w"><a class="mm-logo" href="@Url.Action("Index", "Home")"><span> <img alt="" src="~/img/Allianz_Logo_white.png" style="width: 100%; height: 100%;"></span></a><div class="mm-buttons"><div class="content-panel-open"><div class="os-icon os-icon-grid-circles"></div></div><div class="mobile-menu-trigger"><div class="os-icon os-icon-hamburger-menu-1"></div></div></div></div><div class="menu-and-user"> *@
+                <div class="position-sticky">
+                    <ul class="nav flex-column"> 
+                        <li class="nav-item">
+                            <a class="mm-logo" href="@Url.Action("Index", "Home")">
+                                <span style="margin-top:5px;">
+                                    <img alt="Allianz Logo" src="~/img/Allianz_Logo_white.png" style="width: 100%; height: 100%;">
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white @ViewData["ActivePage"] == " Services" ? "active" : "" " href="@Url.Action("Index", "Home")">
+                                <i class="fas fa-cogs"></i> <span class="ml-2">Services</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white @ViewData["ActivePage"] == " Apps" ? "active" : "" " href="@Url.Action("Apps", "Home")">
+                                <i class="fas fa-th"></i> <span class="ml-2">Apps</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white @ViewData["ActivePage"] == " APIs" ? "active" : "" " href="@Url.Action("Apis", "Home")">
+                                <i class="fas fa-code"></i> <span class="ml-2">APIs</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                            @RenderBody()
+            </main>
+        </div>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

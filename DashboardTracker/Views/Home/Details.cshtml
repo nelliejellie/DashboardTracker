@@ -1,0 +1,64 @@
+﻿@model DashboardTracker.Models.Job
+
+@{
+    ViewData["Title"] = "Service Details";
+}
+
+<h1>Service Details</h1>
+
+<div class="card">
+    <div class="card-header">
+        <h2>@Model.name</h2>
+        <button id="runServiceButton" class="btn btn-primary" onclick="runService()">Run Service</button>
+    </div>
+    <div class="card-body">
+        <p><strong>App Name:</strong> @Model.appName</p>
+        <p><strong>Job URL:</strong> @Model.jobUrl</p>
+        <p><strong>Interval:</strong> @Model.interval @Model.intervalUnit</p>
+        <p><strong>Status:</strong> @Model.status</p>
+        <p><strong>Do Notification:</strong> @Model.doNotification</p>
+        <p><strong>Do Notification Email:</strong> @Model.doNotificationEmail</p>
+        <p><strong>Do Notification Email CC:</strong> @Model.doNotificationEmailCC</p>
+        <p><strong>Do Notification Email BCC:</strong> @Model.doNotificationEmailBC</p>
+        <p><strong>Repeat Until Success:</strong> @Model.repeatUntillSuccess</p>
+        <p><strong>Last Run:</strong> @Model.lastRun?.ToString("g")</p>
+        <p><strong>Next Run:</strong> @Model.nextRun?.ToString("g")</p>
+        <p><strong>Start Date:</strong> @Model.startDate.ToString()</p>
+        <p><strong>End Date:</strong> @Model.endDate?.ToString("g")</p>
+        <p><strong>Created Date:</strong> @Model.createdD?.ToString("g")</p>
+        <p><strong>Created By:</strong> @Model.createdByName</p>
+        <p><strong>Edited Date:</strong> @Model.edited?.ToString("g")</p>
+        <p><strong>Edited By:</strong> @Model.editedByName</p>
+       
+    </div>
+</div>
+
+<script>
+    function runService() {
+        var serviceUrl = '@Model.jobUrl';
+        var button = document.getElementById('runServiceButton');
+        var originalText = button.innerText;
+
+        button.innerText = 'Running...';
+        button.disabled = true;
+
+        fetch(serviceUrl, {
+            method: 'GET'
+        })
+        .then(response => {
+            if (response.ok) {
+                toastr.success('Service has been run smoothly');
+            } else {
+                toastr.error('Failed to run the service');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            toastr.error('An error occurred while running the service');
+        })
+        .finally(() => {
+            button.innerText = originalText;
+            button.disabled = false;
+        });
+    }
+</script>
