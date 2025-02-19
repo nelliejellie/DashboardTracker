@@ -1,5 +1,6 @@
 using DashboardTracker.Data;
 using DashboardTracker.Repository;
+using DashboardTracker.Services;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -31,6 +32,9 @@ namespace DashboardTracker
 
                 //add repository to the dependency injection container
                 builder.Services.AddScoped<JobRepo>();
+                // Register the JobCheckerService
+                builder.Services.AddHttpClient();
+                builder.Services.AddSingleton<IHostedService, JobCheckerService>();
                 var app = builder.Build();
 
 
