@@ -10,73 +10,176 @@
 <div class="row mb-4">
     <div class="col-md-4">
         <div class="card text-white bg-info mb-3">
-            <div class="card-body">
+            <div class="card-body d-flex flex-column align-items-center justify-content-center">
                 <h5 class="card-title">Active Services</h5>
-                <p class="card-text">@Model.Jobs.Count(j => j.status == "active")</p>
+                <p class="card-text fw-bold fs-3">@Model.Jobs.Count(j => j.status == "active")</p>
             </div>
         </div>
     </div>
     <div class="col-md-4">
         <div class="card text-white bg-secondary mb-3">
-            <div class="card-body">
+            <div class="card-body d-flex flex-column align-items-center justify-content-center">
                 <h5 class="card-title">Stopped Services</h5>
-                <p class="card-text">@Model.Jobs.Count(j => j.status == "stop")</p>
+                <p class="card-text fw-bold fs-3">@Model.Jobs.Count(j => j.status == "stop")</p>
             </div>
         </div>
     </div>
     <div class="col-md-4">
         <div class="card text-white bg-primary mb-3">
-            <div class="card-body">
+            <div class="card-body d-flex flex-column align-items-center justify-content-center">
                 <h5 class="card-title">Null Services</h5>
-                <p class="card-text">@Model.Jobs.Count(j => j.status == null)</p>
+                <p class="card-text fw-bold fs-3">@Model.Jobs.Count(j => j.status == null)</p>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row mb-8">
+<div class="row mb-4">
     <div class="col-md-6">
-        <div class="form-group">
-            <label for="searchString">Search by Name</label>
-            <input type="text" class="form-control" id="searchString" name="searchString" value="@ViewData["searchString"]" />
+        <div class="card nextrunner">
+            <div class="card-body charty">
+                <h5 class="card-title">Service Breakdown Chart</h5>
+                <div class="bunky">
+                    <canvas id="serviceBreakdownChart"></canvas>
+                </div>
+                
+            </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="form-group">
-            <label for="statusFilter">Filter by Status</label>
-            <select class="form-control" id="statusFilter" name="statusFilter">
-                <option value="">All</option>
-                <option value="active">Active</option>
-                <option value="stop">Stop</option>
-                <option value="null">Null</option>
-            </select>
+    <div class="col-md-6">
+        <div class="card nextrunner">
+            <div class="card-body">
+                <h5 class="card-title text-center">Next Services to Run</h5>
+                @if (Model.Jobs != null && Model.Jobs.Any())
+                {
+                    var nextTwoJobs = Model.Jobs
+                    .Where(j => j.nextRun.HasValue)
+                    .OrderBy(j => j.nextRun)
+                    .Take(3)
+                    .ToList();
+
+                    if (nextTwoJobs.Any())
+                    {
+                        foreach (var job in nextTwoJobs)
+                        {
+                            <div class="mb-3">
+                                <h6 class="text-decoration-underline">@job.name</h6>
+                                <p><strong>Next Run:</strong> @job.nextRun?.ToString("t")</p>
+                                <p><strong>Status:</strong> <span style="color: @(GetStatusColor(job.status))">@(job.status != null ? job.status : "null")</span></p>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p>No upcoming services.</p>
+                    }
+                }
+                else
+                {
+                    <p>No services available.</p>
+                }
+            </div>
         </div>
-    </div>
-    <div class="col-md-2 d-flex align-items-end">
-        <button type="submit" class="btn btn-primary">Search</button>
     </div>
 </div>
+
+<form method="get" asp-action="Index">
+    <div class="row mb-8">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="searchString">Search by Name</label>
+                <input type="text" class="form-control" id="searchString" name="searchString" value="@ViewData["searchString"]" />
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="statusFilter">Filter by Status</label>
+                <select class="form-control" id="statusFilter" name="statusFilter">
+                    <option value="">All</option>
+                    <option value="active" selected="@(ViewData["statusFilter"]?.ToString() == "active")">Active</option>
+                    <option value="stop" selected="@(ViewData["statusFilter"]?.ToString() == "stop")">Stop</option>
+                    <option value="null" selected="@(ViewData["statusFilter"]?.ToString() == "null")">Null</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </div>
+</form>
 
 <div class="row mt-4">
     @foreach (var job in Model.Jobs)
     {
-        <div class="col-md-4">
-            <div class="card mb-4 @GetCardClass(job.status)">
-                <div class="card-body">
+        <div class="col-md-3">
+            <div class="card carder mb-2 @GetCardClass(job.status)" style="height: 120px;" data-bs-toggle="modal" data-bs-target="#jobDetailsModal"
+                 data-name="@job.name"
+                 data-appname="@job.appName"
+                 data-joburl="@job.jobUrl"
+                 data-interval="@job.interval @job.intervalUnit"
+                 data-status="@(job.status != null ? job.status : "null")"
+                 data-donotification="@job.doNotification"
+                 data-donotificationemail="@job.doNotificationEmail"
+                 data-donotificationemailcc="@job.doNotificationEmailCC"
+                 data-donotificationemailbcc="@job.doNotificationEmailBC"
+                 data-repeatuntilsuccess="@job.repeatUntillSuccess"
+                 data-lastrun="@job.lastRun?.ToString("g")"
+                 data-nextrun="@job.nextRun?.ToString("g")"
+                 data-startdate="@job.startDate.ToString()"
+                 data-enddate="@job.endDate?.ToString("g")"
+                 data-createddate="@job.createdD?.ToString("g")"
+                 data-createdby="@job.createdByName"
+                 data-editeddate="@job.edited?.ToString("g")"
+                 data-editedby="@job.editedByName">
+                <div class="card-body p-2">
                     <h5 class="card-title">
-                        <a href="@Url.Action("Details", "Home", new { id = job.id })" class="text-white">@job.name</a>
+                        <a href="javascript:void(0);" class="text-white">@job.name</a>
                     </h5>
                     <p class="card-text text-white">
-                        <strong>Job URL:</strong> @job.jobUrl <br />
                         <strong>Interval:</strong> @job.interval @job.intervalUnit <br />
-                        <strong>Status:</strong> @job.status <br />
-                        <strong>Last Run:</strong> @job.lastRun?.ToString("g") <br />
-                        <strong>Next Run:</strong> @job.nextRun?.ToString("g") <br />
+                        <strong>Status:</strong> @(job.status != null ? job.status : "null") <br />
+
                     </p>
                 </div>
             </div>
         </div>
     }
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="jobDetailsModal" tabindex="-1" aria-labelledby="jobDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="jobDetailsModalLabel">Job Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <button id="runServiceButton" class="btn btn-primary float-end" onclick="runService()">Run Service</button>
+                <p><strong>Name:</strong> <span id="modalJobName"></span></p>
+                <p><strong>App Name:</strong> <span id="modalAppName"></span></p>
+                <p><strong>Job URL:</strong> <span id="modalJobUrl"></span></p>
+                <p><strong>Interval:</strong> <span id="modalJobInterval"></span></p>
+                <p><strong>Status:</strong> <span id="modalJobStatus"></span></p>
+                <p><strong>Do Notification:</strong> <span id="modalDoNotification"></span></p>
+                <p><strong>Do Notification Email:</strong> <span id="modalDoNotificationEmail"></span></p>
+                <p><strong>Do Notification Email CC:</strong> <span id="modalDoNotificationEmailCC"></span></p>
+                <p><strong>Do Notification Email BCC:</strong> <span id="modalDoNotificationEmailBCC"></span></p>
+                <p><strong>Repeat Until Success:</strong> <span id="modalRepeatUntilSuccess"></span></p>
+                <p><strong>Last Run:</strong> <span id="modalLastRun"></span></p>
+                <p><strong>Next Run:</strong> <span id="modalNextRun"></span></p>
+                <p><strong>Start Date:</strong> <span id="modalStartDate"></span></p>
+                <p><strong>End Date:</strong> <span id="modalEndDate"></span></p>
+                <p><strong>Created Date:</strong> <span id="modalCreatedDate"></span></p>
+                <p><strong>Created By:</strong> <span id="modalCreatedBy"></span></p>
+                <p><strong>Edited Date:</strong> <span id="modalEditedDate"></span></p>
+                <p><strong>Edited By:</strong> <span id="modalEditedBy"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 @functions {
@@ -90,4 +193,89 @@
             _ => "bg-secondary"
         };
     }
+
+    private string GetStatusColor(string status)
+    {
+        return status switch
+        {
+            "active" => "#28a745", // Green
+            "stop" => "#ffc107", // Yellow
+            null => "#dc3545", // Red
+            _ => "#6c757d" // Gray
+        };
+    }
 }
+
+<script>
+    function runService() {
+        var serviceUrl = document.getElementById('modalJobUrl').innerText;
+        var button = document.getElementById('runServiceButton');
+        var originalText = button.innerText;
+
+        button.innerText = 'Running...';
+        button.disabled = true;
+
+        fetch(serviceUrl, {
+            method: 'GET'
+        })
+        .then(response => {
+            if (response.ok) {
+                toastr.success('Service has been run smoothly');
+            } else {
+                toastr.error('Failed to run the service');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            toastr.error('An error occurred while running the service');
+        })
+        .finally(() => {
+            button.innerText = originalText;
+            button.disabled = false;
+        });
+    }
+
+    setInterval(function () {
+        location.reload();
+    }, 300000);
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var ctx = document.getElementById('serviceBreakdownChart').getContext('2d');
+        var serviceBreakdownChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Active', 'Stopped', 'Null'],
+                datasets: [{
+                    data: [
+                        @Model.Jobs.Count(j => j.status == "active"),
+                        @Model.Jobs.Count(j => j.status == "stop"),
+                        @Model.Jobs.Count(j => j.status == null)
+                    ],
+                    backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                    borderColor: ['#28a745', '#ffc107', '#dc3545'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                width: 400,  // Explicit width
+                height: 400,  // Explicit height
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                var label = context.label || '';
+                                var value = context.raw || 0;
+                                return label + ': ' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
